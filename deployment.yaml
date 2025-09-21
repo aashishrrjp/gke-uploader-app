@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gcs-uploader-app
+  namespace: gcs-repo
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: gcs-uploader
+  template:
+    metadata:
+      labels:
+        app: gcs-uploader
+    spec:
+      # This links the pod to the KSA for Workload Identity
+      serviceAccountName: my-app-ksa 
+      containers:
+      - name: uploader-app
+        # Paste the image URL you pushed in Step 1
+        image: us-central1-docker.pkg.dev/mando-all-things-gke/gcs-repo/gcs-uploader-python:v1.0
+        ports:
+        - containerPort: 8080
+        env:
+        - name: GCS_BUCKET_NAME
+          # This should be the GCS bucket for production
+          value: "gcs-repo-bucket"
+        
